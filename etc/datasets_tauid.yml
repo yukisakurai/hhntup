@@ -1,0 +1,15 @@
+PythiaWtaunu_incl.mc11c: !Dataset
+  category: mc11c
+  datatype: 1
+  dirs: [/cluster/data09/endw/analysis/HSG4/higgstautau/skims/hadhad/mc11_7TeV/tauid/mc11_7TeV.107054.PythiaWtaunu_incl.merge.NTUP_TAUMEDIUM.e825_s1349_s1300_r3043_r2993_p851_tid642818_00]
+  ds: mc11_7TeV.107054.PythiaWtaunu_incl.merge.NTUP_TAUMEDIUM.e825_s1349_s1300_r3043_r2993_p851
+  file_pattern: '*.root*'
+  grl: null
+  id: 107054
+  name: PythiaWtaunu_incl.mc11c
+  stream: null
+  tag: e825_s1349_s1300_r3043_r2993_p851
+  tag_pattern: ^e(?P<evnt>\d+)_s(?P<digi>\d+)_s(?P<digimerge>\d+)_r(?P<reco>\d+)_r(?P<recomerge>\d+)_p(?P<ntup>\d+)$
+  treename: tau
+  version: 0
+  year: null

@@ -1,0 +1,100 @@
+#!/usr/bin/env python
+
+
+from argparse import ArgumentParser
+
+parser = ArgumentParser(usage="%(prog)s [args] samplename1 samplename2 ...")
+parser.add_argument('--year', type=int, choices=(11, 12), default=12)
+parser.add_argument("--suffix",
+                  help="suffix appended to sample name", default=None)
+parser.add_argument("--output-path",
+                  help="directory in which to write the output",
+                  default='../hhana/ntuples_hh/running/hhskim/',
+                  dest='outputpath')
+parser.add_argument('-s',"--student",
+                  help="the file (excluding .py extension) containing a "
+                       "class of the same name inheriting from "
+                       "rootpy.batch.Student",
+                  default='hhskim.py')
+parser.add_argument("--db",
+                  help="name of the datasets database file (excluding the "
+                       ".yml extension)", default='datasets_hh')
+parser.add_argument("--sample",
+                  help="name of the datasets" , default=None)
+parser.add_argument("--syst-terms",
+                  help="name of the systematics" , default=None)
+parser.add_argument("--systematics", action="store_true",
+                  help="bool run all systematics", default=False)
+
+args, user_args = parser.parse_known_args()
+
+import sys
+from higgstautau import samples
+
+import subprocess
+from subprocess import call
+
+outputpath = args.outputpath
+student = args.student
+db = args.db
+sample = args.sample
+syst_terms = args.syst_terms
+systematics = args.systematics
+
+exclude_list = [ 'H100', 'H105', 'H110', 'H115', 'H120', 'H130', 'H135', 'H140','H145','H150','mc12b',]
+
+if sample is not None:
+    if syst_terms is not None:
+        cmd = "python run --local --output-path %s -s %s --db %s %s --syst-terms %s --suffix %s" % (
+            outputpath, student, db, sample, syst_terms, syst_terms)
+        print cmd
+        subprocess.call(cmd, shell=True)
+    elif systematics:
+        if 'embed' in sample :
+            syst_list = samples.get_systematics('hadhad',2012,'embed12-HH-IM')[0]
+        else :
+            syst_list = samples.get_systematics('hadhad',2012,sample)[0]
+        for i in range(len(syst_list)):
+            term = syst_list[i][0]
+            cmd = "python run --local --output-path %s -s %s --db %s %s --syst-terms %s --suffix %s" % (
+                outputpath, student, db, sample, term, term)
+            print cmd
+            subprocess.call(cmd, shell=True)
+    else :
+        cmd = "python run --local --output-path %s -s %s --db %s %s" % (
+            outputpath, student, db, sample)
+        print cmd
+        subprocess.call(cmd, shell=True)
+
+else :
+
+    for samples, terms in samples.iter_samples('hadhad', 2012,
+                                               None, systematics=True,
+                                               include_embedded=False):
+        for sample in samples:
+            EXCLUDE=False
+            for exclude in exclude_list:
+                if exclude in sample:
+                    EXCLUDE=True
+            if EXCLUDE: continue
+
+            if syst_terms is not None:
+                cmd = "python run --local --output-path %s -s %s --db %s %s --syst-terms %s --suffix %s" % (
+                    outputpath, student, db, sample, syst_terms, syst_terms)
+                print cmd
+                subprocess.call(cmd, shell=True)
+
+            if systematics :
+                for term in terms:
+                    term = term[0]
+                    cmd = "python run --local --output-path %s -s %s --db %s %s --syst-terms %s --suffix %s" % (
+                        outputpath, student, db, sample, term, term)
+                    print cmd
+                    subprocess.call(cmd, shell=True)
+
+            else :
+                cmd = "python run --local --output-path %s -s %s --db %s %s" % (
+                    outputpath, student, db, sample)
+                print cmd
+                subprocess.call(cmd, shell=True)
+

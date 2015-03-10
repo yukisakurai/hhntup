@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd higgstautau/jetcleaning
+if ! ./setup.py build_ext --inplace
+then
+    cd -
+    echo "Failed to build jet cleaning extension module"
+    exit 1
+fi
+cd -

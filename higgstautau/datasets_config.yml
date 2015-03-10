@@ -1,0 +1,48 @@
+2011:
+    # common config
+    common:
+        grl: 'grl/2011/current.xml'
+    # hadhad config
+    hh_2011:
+        mc_path: '/data2/ysakurai/HiggsAna/hhntuples/v1/'
+        mc_prefix: 'group.phys-higgs.hhskim'
+        mc_pattern: '*hadhad*.root*'
+        mc_treename: 'tau'
+        mc_sampletype: 'standard'
+        data_path: '/data2/ysakurai/HiggsAna/hhntuples/v1/'
+        data_prefix: 'group.phys-higgs.hhskim'
+        data_pattern: '*hadhad.root*'
+        data_treename: 'tau'
+        data_sampletype: 'standard'
+        embed_path: '/data2/ysakurai/HiggsAna/hhntuples/v1/'
+        embed_prefix: 'group.phys-higgs.hhskim'
+        embed_pattern: '*.root*'
+        embed_treename: 'tau'
+        embed_sampletype: 'standard'
+2012:
+    # common config
+    common:
+        grl: 'grl/2012/current.xml'
+    hh:
+        mc_path: '/data2/ysakurai/HiggsAna/hhntuples/v5/'
+        mc_prefix: 'user.ysakurai.hhskim'
+        mc_pattern: '*hadhad*.root*'
+        mc_treename: 'tau'
+        mc_sampletype: 'standard'
+        data_path: '/data2/ysakurai/HiggsAna/hhntuples/v5/'
+        data_prefix: 'user.ysakurai.hhskim'
+        data_pattern: '*hadhad.root*'
+        data_treename: 'tau'
+        data_sampletype: 'standard'
+        data_period_containers: True
+        embed_path: '/data2/ysakurai/HiggsAna/hhntuples/v5/'
+        embed_prefix: 'user.ysakurai.hhskim'
+        embed_pattern: '*hadhad.root*'
+        embed_treename: 'tau'
+        embed_sampletype: 'new'
+    hh_truth:
+        mc_path: '/data2/ysakurai/HiggsAna/hhntuples/v49/'
+        mc_prefix: 'group.phys-higgs.hhtruth'
+        mc_pattern: '*hadhad*.root*'
+        mc_treename: 'tau'
+        mc_sampletype: 'standard'

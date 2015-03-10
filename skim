@@ -1,0 +1,95 @@
+#!/usr/bin/env python
+
+"""
+The master skim launcher and tester
+"""
+
+from rootpy.extern.argparse import ArgumentParser
+
+parser = ArgumentParser()
+parser.add_argument('--local-test', action='store_true', default=False)
+parser.add_argument('--grid-test', action='store_true', default=False)
+parser.add_argument('--yall', action='store_true', default=False)
+parser.add_argument('skim', help='skim name', nargs='*')
+args, user_args = parser.parse_known_args()
+
+from subprocess import call
+from configobj import ConfigObj, flatten_errors
+from validate import Validator
+import sys
+import os
+
+
+TEST_CMD = """\
+source setup.sh && ./grid-batch --dataset %(dataset)s --metadata datasets.cfg
+--student %(student)s %(student_args)s %(testinput)s
+"""
+
+SUBMIT_CMD = """\
+./grid-submit -u user.ysakurai -m datasets.cfg -s %(student)s -v %(version)s
+%(opts)s
+%(student_args)s
+%(dataset)s
+%(options)s
+"""
+#--official --voms=atlas:/atlas/phys-higgs/Role=production
+
+configspec = 'skims.spec'
+if not os.path.isfile(configspec):
+    sys.exit('%s does not exist' % configspec)
+metadata = ConfigObj('skims.cfg', configspec=configspec)
+validator = Validator()
+result = metadata.validate(validator, preserve_errors=True)
+if result != True:
+    for entry in flatten_errors(metadata, result):
+        # each entry is a tuple
+        section_list, key, error = entry
+        if key is not None:
+            section_list.append(key)
+        else:
+            section_list.append('[missing section]')
+        section_string = ', '.join(section_list)
+        if error == False:
+            error = 'Missing value or section.'
+        print section_string, ' = ', error
+    sys.exit(1)
+
+if not args.skim:
+    for skim, info in metadata.items():
+        print "%s (version %d)" % (skim, info['version'])
+    sys.exit(0)
+
+for skim_name in args.skim:
+    skim = metadata[skim_name]
+    dataset = skim['dataset']
+    student = skim['student']
+    testinput = skim['testinput']
+    version = skim['version']
+    options = skim['options']
+    student_args = skim['student_args']
+    if user_args:
+        student_args += ' ' + ' '.join(user_args)
+
+    if args.local_test:
+        cmd = TEST_CMD % locals()
+    else:
+        if student_args:
+            student_args = '--student-args="%s"' % student_args
+        opts = ''
+        if args.grid_test:
+            opts += ' --test'
+        if args.yall or args.local_test:
+            opts += ' --yall'
+        cmd = SUBMIT_CMD % locals()
+
+    cmd = cmd.replace('\n', ' ')
+
+    print "executing:"
+    print
+    print cmd
+    print
+    if args.yall or args.local_test or raw_input("Is this OK? Y/[n] ") == 'Y':
+        try:
+            call(cmd, shell=True)
+        except KeyboardInterrupt:
+            pass
